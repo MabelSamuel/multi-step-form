@@ -100,9 +100,15 @@ provide("prevStep", prevStep);
             @update:modelValue="(value) => formValues[field.id] = value" 
         />
         <button-component label="Submit" /> -->
-        <StepOne v-if="currentStep === 1" />
-        <StepTwo v-if="currentStep === 2" />
-        <StepThree v-if="currentStep === 3" />
+        <Transition>
+          <StepOne v-if="currentStep === 1" />
+        </Transition>
+        <Transition>
+          <StepTwo v-if="currentStep === 2" />
+        </Transition>
+        <Transition name="bounce">
+          <StepThree v-if="currentStep === 3" />
+        </Transition>
       </form>
   </div>
 </template>
@@ -117,5 +123,35 @@ provide("prevStep", prevStep);
 .img-style {
   width: 3rem;
   height: 3rem;
+}
+
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.5s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+
+.bounce-enter-active{
+  animation: bounce-in 0.5s;
+}
+
+.bounce-leave-active{
+  animation: bounce-in 0.5s reverse;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.25);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 </style>
