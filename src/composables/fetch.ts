@@ -5,10 +5,15 @@ export function useFetch<T>(url: string) {
   const data: Ref<T | null> = ref(null);
   const error: Ref<string | null> = ref(null);
 
-  fetch(url)
-    .then((res) => res.json())
-    .then((json: T) => (data.value = json))
-    .catch((err: Error) => (error.value = err.message));
+  const fetchData = async() =>{
+    try {
+      const response = await fetch(url);
+      data.value = await response.json();
+    } catch (err) {
+      error.value = (err as Error).message
+    }
+  }
+  const promise = fetchData();
 
-  return { data, error };
+  return { data, error, promise };
 }

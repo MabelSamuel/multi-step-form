@@ -3,8 +3,8 @@ import { inject } from 'vue';
 import ButtonComponent from './ButtonComponent.vue';
 
 const formValues = inject<Record<string, string>>("formValues", {});
-const validation = inject<(id: string) => void>("validation", () => {});
 const prevStep = inject<() => void>("prevStep", () => {});
+const handleSubmit = inject<() => void>("handleSubmit", () =>{})
 
 </script>
 
@@ -16,7 +16,7 @@ const prevStep = inject<() => void>("prevStep", () => {});
         <p><strong v-font="{fontWeight: '800'}">Email:</strong> {{ formValues.email }}</p>
         <div class="button-style">
             <button-component @next="prevStep" label="Previous" />
-            <button-component @next="validation" label="Submit" />
+            <button-component @next="handleSubmit" label="Submit" />
         </div>
     </div>
 </template>

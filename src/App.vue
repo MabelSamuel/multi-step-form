@@ -4,7 +4,16 @@ import FormComponent from './components/FormComponent.vue';
 
 <template>
   <main class="main-style">
-    <form-component />
+    <Suspense>
+      <template #default>
+        <FormComponent />
+      </template>
+      <template #fallback>
+        <div class="loading">
+          <p>Loading form, please wait...</p>
+        </div>
+      </template>
+    </Suspense>
   </main>
 </template>
 
@@ -12,5 +21,15 @@ import FormComponent from './components/FormComponent.vue';
 .main-style{
   display: flex;
   justify-content: center;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 </style>

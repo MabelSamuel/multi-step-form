@@ -5,79 +5,92 @@ import type { Product } from '../types/product.ts';
 import StepOne from './StepOne.vue';
 import StepTwo from './StepTwo.vue';
 import StepThree from './StepThree.vue';
+import ConfirmModal from './ConfirmModal.vue';
 
 const formValues = reactive<{ [key: string]: string }>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
 });
 
 const formErrors = reactive<{ [key: string]: string }>({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
 });
 
-const { data, error } = useFetch<Product>('https://fakestoreapi.com/products/1')
+const { data, error, promise } = useFetch<Product>('https://fakestoreapi.com/products/1')
 
 const currentStep = ref(1);
 
+const open = ref(false);
+
 const nextStep = () => {
-  if (currentStep.value < 3){
+  if (currentStep.value < 3) {
     currentStep.value++;
-  } 
+  }
 };
 
 const prevStep = () => {
-  if (currentStep.value > 1){
+  if (currentStep.value > 1) {
     currentStep.value--;
   }
 };
 
 const formatString = (str: string): string => {
   return str.replace(/([A-Z])/g, ' $1')
-            .replace(/^./, (char) => char.toUpperCase());
+    .replace(/^./, (char) => char.toUpperCase());
 }
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const validation = (field: string) => {
-    console.log(formValues)
-    const value = formValues[field];
+  console.log(formValues)
+  const value = formValues[field];
 
-    if (!value) {
-        formErrors[field] = `${formatString(field)} is required`;
-        return
-    } 
+  if (!value) {
+    formErrors[field] = `${formatString(field)} is required`;
+    return
+  }
 
-    formErrors[field] = "";
+  formErrors[field] = "";
 
-    if (field === 'email' && !emailRegex.test(value)) {
-        formErrors.email = "Invalid email format";
-    }
-    
-    if (field === 'password' && value.length < 6) {
-        formErrors.password = "Password must be at least 6 characters";
-    }
-    
-    if (field === 'confirmPassword' && value !== formValues.password) {
-        formErrors.confirmPassword = "Passwords do not match";
-    }
+  if (field === 'email' && !emailRegex.test(value)) {
+    formErrors.email = "Invalid email format";
+  }
+
+  if (field === 'password' && value.length < 6) {
+    formErrors.password = "Password must be at least 6 characters";
+  }
+
+  if (field === 'confirmPassword' && value !== formValues.password) {
+    formErrors.confirmPassword = "Passwords do not match";
+  }
 };
 
 const handleSubmit = () => {
-    Object.keys(formValues).forEach(field => validation(field));
+  Object.keys(formValues).forEach(field => validation(field));
+  if (Object.values(formErrors).every(error => error === "")) {
+    open.value = true;
+  }
+};
+
+const confirmSubmit = () => {
+  open.value = false;
+  alert("Form submitted successfully!");
 };
 
 provide("formValues", formValues);
 provide("formErrors", formErrors);
-provide("validation", validation);
 provide("nextStep", nextStep);
 provide("prevStep", prevStep);
+provide("handleSubmit", handleSubmit);
+
+await promise;
 </script>
 
 <template>
@@ -87,37 +100,27 @@ provide("prevStep", prevStep);
     <div v-if="error">
       <p>An error occured: {{ error }}</p>
     </div>
-      <form @submit.prevent="handleSubmit">
-        <!-- <input-label-component 
-            v-for="field in inputFields" 
-            :key="field.id" 
-            :id="field.id" 
-            :label="field.label" 
-            :type="field.type" 
-            :error="formErrors[field.id]" 
-            :modelValue="formValues[field.id]" 
-            @validate="validation(field.id)" 
-            @update:modelValue="(value) => formValues[field.id] = value" 
-        />
-        <button-component label="Submit" /> -->
-        <Transition>
-          <StepOne v-if="currentStep === 1" />
-        </Transition>
-        <Transition>
-          <StepTwo v-if="currentStep === 2" />
-        </Transition>
-        <Transition name="bounce">
-          <StepThree v-if="currentStep === 3" />
-        </Transition>
-      </form>
+    <div>
+      <Transition>
+        <StepOne v-if="currentStep === 1" />
+      </Transition>
+      <Transition>
+        <StepTwo v-if="currentStep === 2" />
+      </Transition>
+      <Transition name="bounce">
+        <StepThree v-if="currentStep === 3" />
+      </Transition>
+    </div>
+
+    <ConfirmModal :open="open" @confirm="confirmSubmit" @close="open = false" />
   </div>
 </template>
 
 
 <style lang="scss" scoped>
 .form-wrapper {
-    width: 27.5rem;
-    margin-block: 2rem;
+  width: 27.5rem;
+  margin-block: 2rem;
 }
 
 .img-style {
@@ -135,11 +138,11 @@ provide("prevStep", prevStep);
   opacity: 0;
 }
 
-.bounce-enter-active{
+.bounce-enter-active {
   animation: bounce-in 0.5s;
 }
 
-.bounce-leave-active{
+.bounce-leave-active {
   animation: bounce-in 0.5s reverse;
 }
 
@@ -147,9 +150,11 @@ provide("prevStep", prevStep);
   0% {
     transform: scale(0);
   }
+
   50% {
     transform: scale(1.25);
   }
+
   100% {
     transform: scale(1);
   }
