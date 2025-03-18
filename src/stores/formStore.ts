@@ -1,9 +1,9 @@
-import { defineStore } from 'pinia';
-import { ref, reactive, computed } from 'vue';
-import { useFetch } from '../composables/fetch.ts';
-import type { Product } from '../types/product.ts';
+import { defineStore } from "pinia";
+import { ref, reactive, computed } from "vue";
+import { useFetch } from "../composables/fetch.ts";
+import type { Product } from "../types/product.ts";
 
-export const useFormStore = defineStore('form', () => {
+export const useFormStore = defineStore("form", () => {
   const formValues = reactive<{ [key: string]: string }>({
     firstName: "",
     lastName: "",
@@ -23,10 +23,12 @@ export const useFormStore = defineStore('form', () => {
   const currentStep = ref(1);
   const open = ref(false);
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const { data, error, promise } = useFetch<Product>('https://fakestoreapi.com/products/1');
+  const { data, error, promise } = useFetch<Product>(
+    "https://fakestoreapi.com/products/1"
+  );
 
   const isFormValid = computed(() => {
-    return Object.values(formErrors).every(error => error === "");
+    return Object.values(formErrors).every((error) => error === "");
   });
 
   function nextStep() {
@@ -42,7 +44,9 @@ export const useFormStore = defineStore('form', () => {
   }
 
   function formatString(str: string): string {
-    return str.replace(/([A-Z])/g, ' $1').replace(/^./, char => char.toUpperCase());
+    return str
+      .replace(/([A-Z])/g, " $1")
+      .replace(/^./, (char) => char.toUpperCase());
   }
 
   function validateField(field: string) {
@@ -55,15 +59,15 @@ export const useFormStore = defineStore('form', () => {
 
     formErrors[field] = "";
 
-    if (field === 'email' && !emailRegex.test(value)) {
+    if (field === "email" && !emailRegex.test(value)) {
       formErrors.email = "Invalid email format";
     }
 
-    if (field === 'password' && value.length < 6) {
+    if (field === "password" && value.length < 6) {
       formErrors.password = "Password must be at least 6 characters";
     }
 
-    if (field === 'confirmPassword' && value !== formValues.password) {
+    if (field === "confirmPassword" && value !== formValues.password) {
       formErrors.confirmPassword = "Passwords do not match";
     }
   }
