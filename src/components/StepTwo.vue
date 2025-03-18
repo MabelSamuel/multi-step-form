@@ -1,14 +1,10 @@
 <script lang="ts" setup>
-import { inject } from 'vue';
+import { useFormStore } from '../stores/formStore.ts';
 import InputLabelComponent from './InputLabelComponent.vue';
 import { stepTwoFields } from '../data/input-field';
 import ButtonComponent from './ButtonComponent.vue';
 
-const formValues = inject<Record<string, string>>("formValues", {});
-const formErrors = inject<Record<string, string>>("formErrors", {});
-const validation = inject<(id: string) => void>("validation", () => {});
-const nextStep = inject<() => void>("nextStep", () => {});
-const prevStep = inject<() => void>("prevStep", () => {});
+const formStore = useFormStore();
 </script>
 
 <template>
@@ -20,21 +16,20 @@ const prevStep = inject<() => void>("prevStep", () => {});
         :id="field.id" 
         :label="field.label" 
         :type="field.type"
-        :error="formErrors[field.id]" 
-        :modelValue="formValues[field.id]" 
-        @validate="validation(field.id)"
-        @update:modelValue="(value) => formValues[field.id] = value"
+        :error="formStore.formErrors[field.id]" 
+        :modelValue="formStore.formValues[field.id]" 
+        @validate="formStore.validateField(field.id)"
+        @update:modelValue="(value) => formStore.formValues[field.id] = value"
     />
     <div class="button-style">
-        <button-component @next="prevStep" label="Previous" />
-        <button-component @next="nextStep" label="Next" />
+        <button-component @next="formStore.prevStep" label="Previous" />
+        <button-component @next="formStore.nextStep" label="Next" />
     </div>
   </div>
 </template>
 
 <style lang="scss">
-.button-style{
+.button-style {
     display: flex;
 }
-    
 </style>

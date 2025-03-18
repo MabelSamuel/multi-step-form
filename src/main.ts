@@ -1,9 +1,11 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import type { Directive } from 'vue';
 import './style.css';
 import App from './App.vue';
 
 const app = createApp(App);
+const pinia = createPinia();
 
 const vUppercase: Directive = {
     beforeMount(el) {
@@ -30,4 +32,5 @@ app.directive('highlight', vHighlight);
 app.directive('uppercase', vUppercase);
 app.directive('font', vFont);
 
+app.use(pinia);
 app.mount('#app');
